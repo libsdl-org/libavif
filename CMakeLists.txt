@@ -199,14 +199,14 @@ if(AVIF_LOCAL_LIBSHARPYUV)
 else(AVIF_LOCAL_LIBSHARPYUV)
     find_package(libsharpyuv QUIET) # not required
 endif()
-if(libsharpyuv_FOUND)
+if(LIBAVIF_WITH_SHARPYUV_SDLIMAGE) #Control sharpyuv through sdl_image
     message(STATUS "libavif: libsharpyuv found; sharp rgb to yuv conversion enabled.")
     set(AVIF_PLATFORM_DEFINITIONS ${AVIF_PLATFORM_DEFINITIONS} -DAVIF_LIBSHARPYUV_ENABLED=1)
-    set(AVIF_PLATFORM_INCLUDES ${AVIF_PLATFORM_INCLUDES} ${LIBSHARPYUV_INCLUDE_DIR})
-    set(AVIF_PLATFORM_LIBRARIES ${AVIF_PLATFORM_LIBRARIES} ${LIBSHARPYUV_LIBRARY})
-else(libsharpyuv_FOUND)
+    #set(AVIF_PLATFORM_INCLUDES ${AVIF_PLATFORM_INCLUDES} ${LIBSHARPYUV_INCLUDE_DIR})
+    set(AVIF_PLATFORM_LIBRARIES sharpyuv)
+else()
     message(STATUS "libavif: libsharpyuv not found")
-endif(libsharpyuv_FOUND)
+endif()
 # ---------------------------------------------------------------------------------------
 
 # Enable all warnings

@@ -520,6 +520,10 @@ target_include_directories(
     avif PUBLIC $<BUILD_INTERFACE:${libavif_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include> PRIVATE ${AVIF_PLATFORM_INCLUDES}
                                                                                                       ${AVIF_CODEC_INCLUDES}
 )
+if(BUILD_SHARED_LIBS AND WIN32 AND NOT CMAKE_PLATFORM_NO_VERSIONED_SONAME)
+    set_property(TARGET avif PROPERTY OUTPUT_NAME "avif-${LIBRARY_SOVERSION}")
+    set_property(TARGET avif PROPERTY DLL_NAME_WITH_SOVERSION OFF)
+endif()
 set(AVIF_PKG_CONFIG_EXTRA_CFLAGS "")
 if(BUILD_SHARED_LIBS)
     target_compile_definitions(avif PUBLIC AVIF_DLL PRIVATE AVIF_BUILDING_SHARED_LIBS)

@@ -197,7 +197,7 @@ if(AVIF_LOCAL_LIBSHARPYUV)
     endif()
     set(libsharpyuv_FOUND TRUE)
 else(AVIF_LOCAL_LIBSHARPYUV)
-    find_package(libsharpyuv QUIET) # not required
+    # find_package(libsharpyuv QUIET) # SDL_image provides libsharpyuv through libwebp
 endif()
 if(LIBAVIF_WITH_SHARPYUV_SDLIMAGE) #Control sharpyuv through sdl_image
     message(STATUS "libavif: libsharpyuv found; sharp rgb to yuv conversion enabled.")

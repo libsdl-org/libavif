@@ -133,6 +133,9 @@ if(AVIF_LOCAL_JPEG)
         set(JPEG_LIBRARY jpeg PARENT_SCOPE)
     endif()
 endif()
+# Don't look for a system libyuv library, and use the minimal version in third_pary/libyuv
+set(libyuv_FOUND FALSE)
+if(0)
 option(AVIF_LOCAL_LIBYUV "Build libyuv by providing your own copy inside the ext subdir." OFF)
 if(AVIF_LOCAL_LIBYUV)
     set(LIB_FILENAME "${CMAKE_CURRENT_SOURCE_DIR}/ext/libyuv/build/${AVIF_LIBRARY_PREFIX}yuv${AVIF_LIBRARY_SUFFIX}")
@@ -176,6 +179,7 @@ else(AVIF_LOCAL_LIBYUV)
     else()
         message(STATUS "libavif: libyuv not found; libyuv-based fast paths disabled.")
     endif()
+endif()
 endif()
 if(libyuv_FOUND)
     set(AVIF_PLATFORM_DEFINITIONS ${AVIF_PLATFORM_DEFINITIONS} -DAVIF_LIBYUV_ENABLED=1)
@@ -298,6 +302,23 @@ endif()
 set(AVIF_CODEC_DEFINITIONS)
 set(AVIF_CODEC_INCLUDES)
 set(AVIF_CODEC_LIBRARIES)
+
+if(NOT libyuv_FOUND)
+    set(AVIF_SRCS ${AVIF_SRCS}
+        third_party/libyuv/source/scale.c
+        third_party/libyuv/source/scale_common.c
+        third_party/libyuv/source/scale_any.c
+        third_party/libyuv/source/row_common.c
+        third_party/libyuv/source/planar_functions.c
+    )
+    if(DEFINED ANDROID_ABI OR DEFINED APPLE)
+        # When building third_party/libyuv/source/scale.c, some functions use
+        # some of the parameters only inside an assert statement. This causes
+        # unused parameter warnings when building for Android. Suppress the
+        # warning in that case.
+        add_compile_options(-Wno-unused-parameter)
+    endif()
+endif()
 
 if(AVIF_CODEC_DAV1D)
     set(AVIF_CODEC_DEFINITIONS ${AVIF_CODEC_DEFINITIONS} -DAVIF_CODEC_DAV1D=1)
@@ -524,6 +545,7 @@ if(BUILD_SHARED_LIBS AND WIN32 AND NOT CMAKE_PLATFORM_NO_VERSIONED_SONAME)
     set_property(TARGET avif PROPERTY OUTPUT_NAME "avif-${LIBRARY_SOVERSION}")
     set_property(TARGET avif PROPERTY DLL_NAME_WITH_SOVERSION OFF)
 endif()
+target_include_directories(avif PRIVATE "${libavif_SOURCE_DIR}/third_party/libyuv/include/")
 set(AVIF_PKG_CONFIG_EXTRA_CFLAGS "")
 if(BUILD_SHARED_LIBS)
     target_compile_definitions(avif PUBLIC AVIF_DLL PRIVATE AVIF_BUILDING_SHARED_LIBS)

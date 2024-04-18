@@ -533,6 +533,9 @@ if(NOT AVIF_CODEC_AOM
     message(WARNING "libavif: No decoding library is enabled.")
 endif()
 
+if(BUILD_SHARED_LIBS AND WIN32)
+    set(CMAKE_SHARED_LIBRARY_NAME_WITH_VERSION 1)
+endif()
 add_library(avif ${AVIF_SRCS})
 set_target_properties(avif PROPERTIES VERSION ${LIBRARY_VERSION} SOVERSION ${LIBRARY_SOVERSION} C_VISIBILITY_PRESET hidden)
 target_compile_definitions(avif PRIVATE ${AVIF_PLATFORM_DEFINITIONS} ${AVIF_CODEC_DEFINITIONS})
@@ -541,15 +544,14 @@ target_include_directories(
     avif PUBLIC $<BUILD_INTERFACE:${libavif_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include> PRIVATE ${AVIF_PLATFORM_INCLUDES}
                                                                                                       ${AVIF_CODEC_INCLUDES}
 )
-if(BUILD_SHARED_LIBS AND WIN32 AND NOT CMAKE_PLATFORM_NO_VERSIONED_SONAME)
-    set_property(TARGET avif PROPERTY OUTPUT_NAME "avif-${LIBRARY_SOVERSION}")
-    set_property(TARGET avif PROPERTY DLL_NAME_WITH_SOVERSION OFF)
-endif()
 target_include_directories(avif PRIVATE "${libavif_SOURCE_DIR}/third_party/libyuv/include/")
 set(AVIF_PKG_CONFIG_EXTRA_CFLAGS "")
 if(BUILD_SHARED_LIBS)
     target_compile_definitions(avif PUBLIC AVIF_DLL PRIVATE AVIF_BUILDING_SHARED_LIBS)
     set(AVIF_PKG_CONFIG_EXTRA_CFLAGS " -DAVIF_DLL")
+    if(MSVC)
+        set_property(TARGET avif PROPERTY PREFIX "lib")
+    endif()
     if(AVIF_LOCAL_LIBGAV1)
         set_target_properties(avif PROPERTIES LINKER_LANGUAGE "CXX")
     endif()

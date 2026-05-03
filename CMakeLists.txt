@@ -454,13 +454,6 @@ target_sources(avif_obj PRIVATE ${AVIF_SRCS})
 # /usr/local/include.
 set(CMAKE_FIND_FRAMEWORK LAST)
 
-if(UNIX OR MINGW)
-    # Find out if we have threading available
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-    find_package(Threads)
-    target_link_libraries(avif_obj PUBLIC m Threads::Threads)
-endif()
-
 if(NOT AVIF_LIBYUV_ENABLED)
     target_sources(
         avif_obj
@@ -617,6 +610,12 @@ endif()
 # Main avif library.
 set_target_properties(avif PROPERTIES VERSION ${LIBRARY_VERSION} SOVERSION ${LIBRARY_SOVERSION})
 target_sources(avif PRIVATE $<TARGET_OBJECTS:avif_obj>)
+if(UNIX OR MINGW)
+    # Find out if we have threading available
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads)
+    target_link_libraries(avif PUBLIC m Threads::Threads)
+endif()
 target_include_directories(avif PUBLIC $<BUILD_INTERFACE:${libavif_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 if(BUILD_SHARED_LIBS)
     target_compile_definitions(avif INTERFACE AVIF_DLL)

@@ -478,7 +478,7 @@ if(AVIF_CODEC_DAV1D_ENABLED)
     target_sources(avif_obj PRIVATE src/codec_dav1d.c)
 
     if(UNIX AND NOT APPLE)
-        target_link_libraries(dav1d::dav1d INTERFACE ${CMAKE_DL_LIBS}) # for dlsym
+        # target_link_libraries(dav1d::dav1d INTERFACE ${CMAKE_DL_LIBS}) # for dlsym
     endif()
 
     avif_target_link_library(dav1d::dav1d)

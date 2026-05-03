@@ -182,9 +182,9 @@ function(avif_target_link_library target)
         set(install_target ${target})
     endif()
     # The transitive dependency needs to be an export link library in a static build.
-    if(NOT BUILD_SHARED_LIBS)
-        target_link_libraries(avif PUBLIC $<INSTALL_INTERFACE:${install_target}>)
-    endif()
+#    if(NOT BUILD_SHARED_LIBS)
+        target_link_libraries(avif PRIVATE ${install_target})
+#    endif()
 endfunction()
 
 #[[

@@ -610,7 +610,7 @@ endif()
 # Main avif library.
 set_target_properties(avif PROPERTIES VERSION ${LIBRARY_VERSION} SOVERSION ${LIBRARY_SOVERSION})
 target_sources(avif PRIVATE $<TARGET_OBJECTS:avif_obj>)
-if(UNIX OR MINGW)
+if(UNIX) # OR MINGW
     # Find out if we have threading available
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads)
